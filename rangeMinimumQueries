@@ -1,0 +1,58 @@
+// using Segmented tree  help->coding blocks segmented trees
+#include<bits/stdc++.h>
+using namespace std;
+ 
+ 
+void buildTree(int tree[],int arr[],int s,int e,int index)
+{
+    //Base cases
+    if(s>e) return;
+    if(s==e) // leaf node
+    {
+        tree[index]=arr[s];
+        return;
+    }
+    //
+    int mid=s+(e-s)/2;
+    buildTree(tree,arr,s,mid,2*index);
+    buildTree(tree,arr,mid+1,e,2*index+1);
+    tree[index]=min(tree[2*index],tree[2*index+1]);
+}
+//Query perform
+int query(int tree[],int index,int s,int e,int qs,int qe)
+{
+    //non overlapping case
+    if(qe<s || qs>e)
+        return INT_MAX;
+ 
+    //overlapping case
+    if(s>=qs && e<=qe)
+        return tree[index];
+ 
+    //partial overlapping case
+    int mid=s+(e-s)/2;
+    int left=query(tree,2*index,s,mid,qs,qe);
+    int right=query(tree,2*index+1,mid+1,e,qs,qe);
+    return min(left,right);
+}
+ 
+int main()
+{
+    int n,q;
+    cin>>n>>q;
+    int arr[n];
+    
+    for(int i=0;i<n;i++) cin>>arr[i];
+    int tree[4*n+1]; // representing segment trees in array
+    // Building segment trees
+    int s=0,e=n-1,index=1;// index in tree starts from 1
+    buildTree(tree,arr,s,e,index);
+    while(q--)
+    {
+        int a,b;
+        cin>>a>>b;//1 based indexing input but we have computed 0 based indexing
+        cout<<query(tree,index,s,e,a-1,b-1)<<"\n";//1 based indexing
+ 
+    }
+    return 0;
+}
